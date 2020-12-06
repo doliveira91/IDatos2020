@@ -1,21 +1,7 @@
 #!/usr/bin/python3
-from elasticsearch import Elasticsearch
 import requests
 import json
-
-# Inicializo cliente ELK
-elk_client = Elasticsearch(hosts=["localhost:9200"])
-
-# print (client)
-if elk_client.indices.exists(index="autos") is True:
-    # print ("El indice ya existe");
-    elk_client.indices.delete(index="autos")
-    elk_client.indices.create(index="autos")
-    result = 1
-else:
-    elk_client.indices.create(index="autos")
-    # print ("Indice creado");
-
+import mysql.connector
 
 publications_url = "https://api.mercadolibre.com/sites/MLU/search?q=autos&offset="
 offset = 0
@@ -35,7 +21,7 @@ while offset < 1000:
             car_price_currency = result["currency_id"]
             car_attributes = result["attributes"]
             publication_thumbnail = result["thumbnail"]
-
+            ubication = result["seller_addres"]["state"]["name"]
             for attribute in car_attributes:
                 attribute_id = attribute["id"]
                 attribute_value = attribute["value_name"]
@@ -53,26 +39,23 @@ while offset < 1000:
                     car_model = attribute_value
                 elif attribute_id == "VEHICLE_YEAR":
                     car_year = attribute_value
+                elif attribute_id == "TRIM":
+                    car_version = attribute_value
+                elif attribute_id == "TRANSMISSION":
+                    car_transmission = attribute_value
 
-            publication_document = {
-                "brand": car_brand,
-                "model": car_model,
-                "doors": car_doors,
-		"year" : car_year,
-                "kilometers": car_kilometers,
-                "fuel_type": car_fuel_type,
-                "price": car_price,
-                "currency": car_price_currency,
-                "condition": car_condition,
-                "publication_link": publication_link,
-                "publication_title": publication_title,
-                "thumbnail": publication_thumbnail,
-            }
+                mydb = mysql.connector.connect(
+                  host="localhost",
+                  user="idatos",
+                  password="IDATOS2020",
+                  database="IDATOS")
 
-            json_document = json.dumps(publication_document)
-            log_json_document = json.dumps(publication_document, indent=4)
-            elk_client.index(index="autos", body=json_document)
-
+                mycursor = mydb.cursor()
+                sql = "INSERT INTO vehiculos (condicion,precio,moneda,marca,modelo,version,ubicacion,year,tipo_combustible,transmision,kilometraje,cant_puertas,url_imagen,url_publiation,publication_title, source ) VALUES (%s, %s)"
+                val = (car_condition, car_price, car_price_currency, car_brand, car_model, car_version, ubication, car_year, car_fuel_type, car_transmission, car_kilometers, car_doors, publication_thumbnail, publication_link, publication_title, 'MercadoLibre')
+                mycursor.execute(sql, val)
+                mydb.commit()
+                print(mycursor.rowcount, "record inserted.")
     else:
         print(r)
         print("Error")
