@@ -1,8 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-Load and query cars from MercadoLibre using Elasticseach, Python and React.
+Load and query cars from MercadoLibre and El Gallito Luis using Elasticseach, Python and React.
 
 ## Setup
+- Install MySQL server in your machine
+- Create the database and schema from schema.sql
 - Install `elasticsearch` in your machine
 - Enable cors adding the following lines in `elasticsearch.yml`:
 ```
@@ -17,5 +19,6 @@ http.cors.allow-credentials: true
 - Install js dependencies: `yarn install`
 
 ## Run the code
-- Load the data to your index: `python create_index.py`
+- Load the data to your mysql instance using MercadoLibreAPIClient.py and GallitoLuisClient.py
+- Load the data from your mysql instance to Elasticsearch using DatabaseToElasticsearch.py
 - Run the react app: `yarn start`
