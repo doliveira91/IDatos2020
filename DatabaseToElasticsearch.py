@@ -37,7 +37,7 @@ for x in myresult:
   car_year = x[7]
   car_kilometers = x[10]
   car_fuel_type = x[8]
-  car_price = x[1]
+  car_price = int(x[1])
   car_price_currency = x[2]
   car_condition = x[0]
   publication_link = x[13]
