@@ -3,7 +3,7 @@ import requests
 import json
 import mysql.connector
 
-car_condition = "usado"
+car_condition = "used"
 publication_link = "https://www.gallito.com.uy/suzuki-celerio-2015-27600-km-unico-dueno-sin-choques-18675701"
 publication_title = "Suzuki Celerio 2015 - 27600 Km -unico Dueno - Sin Choques"
 car_price = "10000"
