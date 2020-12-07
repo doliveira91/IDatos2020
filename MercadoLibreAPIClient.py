@@ -21,7 +21,10 @@ while offset < 1000:
             car_price_currency = result["currency_id"]
             car_attributes = result["attributes"]
             publication_thumbnail = result["thumbnail"]
-            ubication = result["seller_addres"]["state"]["name"]
+            try:
+              ubication = result["seller_address"]["state"]["name"]
+            except TypeError:
+              ubication = "NA"
             for attribute in car_attributes:
                 attribute_id = attribute["id"]
                 attribute_value = attribute["value_name"]
@@ -43,19 +46,13 @@ while offset < 1000:
                     car_version = attribute_value
                 elif attribute_id == "TRANSMISSION":
                     car_transmission = attribute_value
-
-                mydb = mysql.connector.connect(
-                  host="localhost",
-                  user="idatos",
-                  password="IDATOS2020",
-                  database="IDATOS")
-
-                mycursor = mydb.cursor()
-                sql = "INSERT INTO vehiculos (condicion,precio,moneda,marca,modelo,version,ubicacion,year,tipo_combustible,transmision,kilometraje,cant_puertas,url_imagen,url_publiation,publication_title, source ) VALUES (%s, %s)"
-                val = (car_condition, car_price, car_price_currency, car_brand, car_model, car_version, ubication, car_year, car_fuel_type, car_transmission, car_kilometers, car_doors, publication_thumbnail, publication_link, publication_title, 'MercadoLibre')
-                mycursor.execute(sql, val)
-                mydb.commit()
-                print(mycursor.rowcount, "record inserted.")
+            mydb = mysql.connector.connect(host="localhost",user="idatos",password="idatos",database="IDATOS")
+            mycursor = mydb.cursor()
+            sql = "INSERT INTO vehiculo (condicion,precio,moneda,marca,modelo,version,ubicacion,year,tipo_combustible,transmision,kilometraje,cant_puertas,url_imagen,url_publiation,publication_title, source ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            val = (car_condition, car_price, car_price_currency, car_brand, car_model, car_version, ubication, car_year, car_fuel_type, car_transmission, car_kilometers, car_doors, publication_thumbnail, publication_link, publication_title, 'MercadoLibre')
+            mycursor.execute(sql, val)
+            mydb.commit()
+            print(mycursor.rowcount, "record inserted.")
     else:
         print(r)
         print("Error")
